@@ -477,9 +477,10 @@ def generate_even(n):
         add_markdown=generate_lab_18_indtask
     else:
         return None
-    add = add_markdown+cell_code(metadataId="lab"+n+"indCodeCell")+"]}"
+    add = add_markdown+cell_code(metadataId="lab"+n+"indCodeCell")
+    +",\"nbformat\": 4,\"nbformat_minor\": 1]}"
     file = None
-    return file + add     
+    return file    
 
 
 # In[ ]:
