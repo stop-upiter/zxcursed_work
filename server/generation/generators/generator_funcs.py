@@ -1,24 +1,22 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[154]:
+# *Необходимые импорты*
+
+# In[79]:
 
 
 import numpy as np
 from sympy import Eq, symbols, linsolve, latex
 
 
-# In[243]:
+# # Генерация индивидуализированных чётных лабораторных работ на курсе Компьютерный практикум по алгебре на Python
 
+# ## Функции для генерации
 
-def generate_matrix_r(n, m):
-    matrix = np.random.randint(-150,151, (n,m))
-    while(matrix.all == 0):
-        matrix = np.random.randint(-150,151, (n,m))
-    return matrix
+# Генерировать целое число в диапазоне $[n;m)$ без числа $ex$. Исключение числа $ex$ из генерации необходимо для некоторых случаев генерации.
 
-
-# In[245]:
+# In[80]:
 
 
 def generate_number_except(n, m, ex):
@@ -28,21 +26,48 @@ def generate_number_except(n, m, ex):
     return num
 
 
-# In[246]:
+# Частным случаем необходимости исключить число из диапазона является исключение нуля.
+
+# In[81]:
 
 
 def generate_nonzero_number(n, m):
     return generate_number_except(n, m, 0)
 
 
-# In[249]:
+# Бросаем монетку
+
+# In[188]:
+
+
+def random_bool():
+    return np.random.randint(0, 2) == 0
+
+
+# Создадим свою функцию создания вектора для дальнейшего удобства в использовании
+
+# In[82]:
 
 
 def generate_vector(n):
     return generate_matrix_r(n, 1)
 
 
-# In[250]:
+# Функция генерации рандомной матрицы размера n на m
+
+# In[83]:
+
+
+def generate_matrix_r(n, m):
+    matrix = np.random.randint(-150,151, (n,m))
+    while(matrix.all == 0):
+        matrix = np.random.randint(-150,151, (n,m))
+    return matrix
+
+
+# Генерируем СЛАУ $AX = b$
+
+# In[84]:
 
 
 def generate_system(): #задача 4
@@ -52,7 +77,23 @@ def generate_system(): #задача 4
     return matrixA, matrixB, solution
 
 
-# In[251]:
+# Генерируем 2D точку
+
+# In[85]:
+
+
+def generate_point2D():
+    x = np.random.randint(-10, 11)
+    y = np.random.randint(-10, 11)
+    while(x == 0 and y == 0):
+        x = np.random.randint(-10, 11)
+        y = np.random.randint(-10, 11)
+    return (x, y)
+
+
+# Генерируем 3D точку
+
+# In[86]:
 
 
 def generate_point3D():
@@ -66,7 +107,24 @@ def generate_point3D():
     return (x, y, z)
 
 
-# In[252]:
+# Генерируем набор из четырёх точек в двумерном пространстве. Координаты точек по осям не совпадают
+
+# In[87]:
+
+
+def generate_4_points2D():# задача 8
+    points = (generate_point2D(),  generate_point2D(),  generate_point2D(),  generate_point2D())
+    for i in range(0, 1):
+        while(points[0][i] == points[1][i] and points[0][i] == points[2][i] or
+           points[0][i] == points[1][i] and points[0][i] == points[3][i] or
+           points[3][i] == points[1][i] and points[1][i] == points[2][i]):
+            points = (generate_point2D(),  generate_point2D(),  generate_point2D(),  generate_point2D())
+    return points
+
+
+# Генерируем набор из четырёх точек в трёхмерном пространстве. Тут необходим невырожденный случай, так ещё случай, когда координаты точек в каком-либо измерении не совпадают
+
+# In[88]:
 
 
 def generate_4_points3D(): # задача 6
@@ -79,7 +137,9 @@ def generate_4_points3D(): # задача 6
     return points
 
 
-# In[244]:
+# Генерация матрицы размена $n$ на $m$ с рангом $r$
+
+# In[89]:
 
 
 def generate_matrix(n, m, r):
@@ -106,32 +166,15 @@ def generate_matrix(n, m, r):
         return None    
 
 
-# In[253]:
+# In[90]:
 
 
-def generate_point2D():
-    x = np.random.randint(-10, 11)
-    y = np.random.randint(-10, 11)
-    while(x == 0 and y == 0):
-        x = np.random.randint(-10, 11)
-        y = np.random.randint(-10, 11)
-    return (x, y)
+generate_matrix(2, 3, 2)
 
 
-# In[254]:
+# Генерируем набор коэффициентов для комплексного уравнения $(a+b\cdot i)x^2 + (c+d\cdot i)x + e + f\cdot i = 0$
 
-
-def generate_4_points2D():# задача 8
-    points = (generate_point2D(),  generate_point2D(),  generate_point2D(),  generate_point2D())
-    for i in range(0, 1):
-        while(points[0][i] == points[1][i] and points[0][i] == points[2][i] or
-           points[0][i] == points[1][i] and points[0][i] == points[3][i] or
-           points[3][i] == points[1][i] and points[1][i] == points[2][i]):
-            points = (generate_point2D(),  generate_point2D(),  generate_point2D(),  generate_point2D())
-    return points
-
-
-# In[255]:
+# In[91]:
 
 
 def generate_coeffs_irrational(): # задача 10
@@ -140,7 +183,7 @@ def generate_coeffs_irrational(): # задача 10
             generate_nonzero_number(-100, 100), generate_nonzero_number(-100, 100)]
 
 
-# In[264]:
+# In[92]:
 
 
 def generate_base():
@@ -153,15 +196,9 @@ def generate_base():
     return [np.array(e[:, 0]), np.array(e[:, 1]), np.array(e[:, 2])]
 
 
-# In[271]:
+# Случайный выбор "красивых" уголов
 
-
-# задача 12
-def gen_12():
-    return [generate_matrix_r(3, 3)] + generate_base()
-
-
-# In[344]:
+# In[185]:
 
 
 angles = ["𝛑/3", "2*𝛑/3", "𝛑/4", "3*𝛑/4", "𝛑/6", "5*𝛑/6"]
@@ -171,10 +208,12 @@ def generate_angle():
     return angles[np.random.randint(0, 6)]
 
 def generate_angle_frac():
-    return angles[np.random.randint(0, 6)]
+    return angles_frac[np.random.randint(0, 6)]
 
 
-# In[331]:
+# Случайный выбор из двух возможных типов параболы
+
+# In[94]:
 
 
 parabola_types = ["y^2 = 2px", "x^2 = 2py"]
@@ -182,34 +221,75 @@ def generate_parabola_type():
     return parabola_types[np.random.randint(0, 2)]
 
 
-# In[332]:
+# ## Подготовка данных для индивидуальных заданий
+
+# Данные для задачи 2 - это рандомные логические выражения и целочисленные значения, генерировать их целесообразнее вместе с текстом задания.
+
+# Данные для задачи 4: Матрица А и вектор b
+
+# In[96]:
+
+
+def gen_4():
+    res = generate_system()
+    return [res[0], res[1]] 
+
+
+# Данные для задачи 6: результат функции **generate_4_points3D**
+
+# Данные для задачи 8: результат функции **generate_4_points2D**
+
+# Данные для задачи 10: результат функции **generate_coeffs_irrational**
+
+# Данные для задачи 12: матрица размера 3 на 3 и базисные вектора $e_1, e_2, e_3$
+
+# In[97]:
+
+
+# задача 12
+def gen_12():
+    return [generate_matrix_r(3, 3)] + generate_base()
+
+
+# Данные для задачи 14: центр эллипса, его вертикальная полуось $b$ и эксцентриситет $\epsilon$, угол поворота $\alpha$.
+
+# In[182]:
 
 
 def gen_14():
     point = generate_point2D()
-    parabola_type = generate_parabola_type()
-    angle = generate_angle()
-    return [point, ]
+    a = generate_nonzero_number(1, 10)
+    b = generate_number_except(1, 10, a)
+    
+    tmp = min(a,b)
+    a = max(a,b)
+    b = tmp
+    
+    c = (a**2-b**2)**0.5
+    epsilon = c/a
+    return [point, b, epsilon, generate_angle_frac()]
 # задача 14
 
 
-# In[345]:
+# Данные для задачи 16: точка двумерного пространства, вид уравнения параболы, значение коэффициента p, случайный угол поворота
+
+# In[165]:
 
 
 def gen_16():
-    return [generate_nonzero_number(-10, 10), generate_angle_frac()]
+    return [generate_point2D(), generate_parabola_type(), 
+            generate_nonzero_number(-10, 10), generate_angle_frac()]
 
 
-# In[276]:
+# Данные для задачи 18: соответствуют данных, генерируемым функцией **gen_4** для задачи 4.
 
+# ## Генерация текста индивидуальных заданий
 
-def gen_4():
-    matrixB = generate_vector(4)
-    matrixA = generate_matrix_r(4, 4)
-    return [matrixA, matrixB] 
+# ### Вспомогательная функция
 
+# Записать в маркдауне матрицу или вектор (с учётом дополнительных символов для записи в файл)
 
-# In[316]:
+# In[166]:
 
 
 def markdown_matrix(value, name="A"):
@@ -231,28 +311,106 @@ def markdown_matrix(value, name="A"):
     return align_start+name_text+matrix_start+add+matrix_end+align_end
 
 
-# In[317]:
+# In[167]:
 
 
 markdown_matrix(generate_matrix_r(3,3))
 
 
-# In[318]:
+# Результат после записи в файл:
+
+# \begin{align*}A =\left(\begin{matrix}-37 & -62 & -110 \\-100 & -124 & -119 \\85 & -111 & -109\end{matrix}\right)\end{align*}
+
+# ### Генерация текстов
+
+# Генерация текста задания для лабораторной 2
+
+# In[193]:
 
 
 def generate_lab_2_indtask():
-    needs_for_lab_2 = gen_2()
-    matrix_a = markdown_matrix(needs_for_lab_2, "$A$")
+    a = generate_nonzero_number(5,15)
+    b = generate_number_except(10, 35, a)
+    a, b = min(a,b), max(a,b)
     
-    add_text = matrix_a
+    step_1 = "1. Составьте матрицу $A$ размера 7 на 8, состоящую из "
+    step_1+= str(a) + " в "
+    if (random_bool()):
+        step_1+="не"
+
+    step_1+="четных строках "
+    
+    if (random_bool()):
+        step_1+="не"
+        
+    step_1+="четных столбцов, остальные элементы равны "
+    step_1+= str(b) + ".\n"
+    
+    step_2 = "2. "
+    if (random_bool()):
+        step_2+="Удалите "
+        if (random_bool()):
+            step_2+="строку "
+            step_2+=str(np.random.randint(0, 8))
+        else:
+            step_2+="столбец "
+            step_2+=str(np.random.randint(0, 9))
+    else:
+        step_2+="Добавьте "
+        flag = random_bool()
+        if (flag):
+            step_2+="строку "
+        else:
+            step_2+="столбец "
+        if (random_bool()):
+            step_2+="нулей "
+        else:
+            step_2+="единиц "
+        if (random_bool()):
+            step_2+="до "
+        else:
+            step_2+="после "
+        if (flag):
+            step_2+="строки "
+            step_2+=str(np.random.randint(0, 8))
+        else:
+            step_2+="столбца "
+            step_2+=str(np.random.randint(0, 9))
+    step_2+=".\n"
+    
+    p1 = str(np.random.randint(0, 8))
+    p2 = str(np.random.randint(0, 8))
+    step_3="3. Замените элементы $A[" +p1+", "+p2+"]$ и "
+    step_3+="$A[" +p1+", "+p2+"]$ на $"
+    
+    if (random_bool()):
+        if (random_bool()):
+            step_3+="2^b"
+        else:
+            step_3+="b^2"
+    else:
+        if (random_bool()):
+            step_3+= str(generate_nonzero_number(-5, 5)) +"b"
+        else:
+            step_3+="b"
+            if (random_bool()):
+                step_3+= "-"
+            else:
+                step_3+= "+"
+            step_3+=str(np.random.randint(1, 10))
+    step_3+="$.\n"
+    
+    step_4 = "4. Выполните подстановку, заменив $b$ на " + str(np.random.randint(10, 30)) + "."
+    
     text_4=["### Индивидуальное задание\n",
-            "В данной матрице\n",
-            add_text,
-            "выполнить заданные подстановки, результат каждой подстановки выводить в виде отдельной матрицы."]
+            "Выполнить заданные подстановки, результат каждой подстановки выводить в виде отдельной матрицы.\n"
+           + step_1 + step_2 + step_3 + step_4]
     return text_4
 
 
-# In[318]:
+# Генерация текста задания для лабораторной 4
+
+# In[169]:
 
 
 def generate_lab_4_indtask():
@@ -271,7 +429,9 @@ def generate_lab_4_indtask():
     return text_4
 
 
-# In[318]:
+# Генерация текста задания для лабораторной 6
+
+# In[170]:
 
 
 def generate_lab_6_indtask():
@@ -297,7 +457,9 @@ def generate_lab_6_indtask():
     return text_6
 
 
-# In[319]:
+# Генерация текста задания для лабораторной 8
+
+# In[171]:
 
 
 def generate_lab_8_indtask():
@@ -318,7 +480,9 @@ def generate_lab_8_indtask():
     return text_8
 
 
-# In[320]:
+# Генерация текста задания для лабораторной 10
+
+# In[172]:
 
 
 def generate_lab_10_indtask():
@@ -341,7 +505,9 @@ def generate_lab_10_indtask():
     return text_10
 
 
-# In[321]:
+# Генерация текста задания для лабораторной 12
+
+# In[173]:
 
 
 def generate_lab_12_indtask():
@@ -360,34 +526,43 @@ def generate_lab_12_indtask():
     return text_12
 
 
-# In[349]:
+# Генерация текста задания для лабораторной 14
+
+# In[183]:
 
 
 def generate_lab_14_indtask():
     needs_for_lab_14 = gen_14()
 
     add_text = "Построить эллипс с заданными центром $" 
-    + str(needs_for_lab_14[0]) + "$, вертикальной полуосью $" 
-    + str(needs_for_lab_14[1]) + "S и эксцентриситетом $"
-    + str(needs_for_lab_14[2]) + ".\n"
+    add_text += str(needs_for_lab_14[0]) + "$, вертикальной полуосью $" 
+    add_text += str(needs_for_lab_14[1]) + "$ и эксцентриситетом $"
+    add_text += str(needs_for_lab_14[2]) + "$.\n"
+    add_text += "Изобразить на графике этот эллипс, а также эллипс, повернутый на угол $\alpha = " 
+    add_text += needs_for_lab_14[3] + "$ против часовой стрелки.\n"
     
     text_14=["### Индивидуальное задание\n",
             add_text,
-            "Изобразить на графике этот эллипс, а также эллипс, повернутый на угол $\alpha$ против часовой стрелки.\n",
             "Вывести на экран центр и фокусы эллипса, длины полуосей, уравнение эллипса, вершины эллипса."]
     return text_14
 
 
-# In[350]:
+# Генерация текста задания для лабораторной 16
+
+# In[177]:
 
 
 def generate_lab_16_indtask():
     needs_for_lab_16 = gen_16()
-    p = needs_for_lab_16[0]
-    alpha = needs_for_lab_16[1]
+    point = needs_for_lab_16[0]
+    parabola_type = needs_for_lab_16[1]
+    p = needs_for_lab_16[2]
+    alpha = needs_for_lab_16[3]
     
-    add_text = "Построить экземпляр класса Parabola - параболу $x^{2} = 2py$ с заданным $p = "
-    + p +"$, построить другую параболу путем поворота исходной параболы  на угол $\alpha "+ alpha + "$ радиан.\n"
+    add_text = "Построить экземпляр класса Parabola - параболу $" + parabola_type 
+    add_text+= "$ с заданным $p = " + str(p)
+    add_text+="$, построить другую параболу путем поворота исходной параболы  на угол $\alpha " 
+    add_text+= alpha + "$ радиан и сдвигом в центр $"+ str(point) + "$.\n"
     
     text_16=["### Индивидуальное задание\n",
             add_text,
@@ -396,7 +571,9 @@ def generate_lab_16_indtask():
     return text_16
 
 
-# In[342]:
+# Генерация текста задания для лабораторной 18
+
+# In[178]:
 
 
 def generate_lab_18_indtask():
@@ -413,7 +590,11 @@ def generate_lab_18_indtask():
     return text_18
 
 
-# In[338]:
+# ## Подготовка для вставки задания в файл .ipynb
+
+# Ячейка для вставки в файл задания
+
+# In[179]:
 
 
 def cell_for_insert(text_arr=[], metadata_id="defaultId"):
@@ -428,7 +609,9 @@ def cell_for_insert(text_arr=[], metadata_id="defaultId"):
     return add_text_metadata + add_text_sourse + add_text + add_text_end
 
 
-# In[339]:
+# Ячейка маркдауна для вставки в файл задания
+
+# In[135]:
 
 
 def cell_markdown(text_arr=[], metadata_id="defaultMarkdownCell", isFirst=False):
@@ -440,7 +623,9 @@ def cell_markdown(text_arr=[], metadata_id="defaultMarkdownCell", isFirst=False)
     return add_text_begin + add_text + add_text_end
 
 
-# In[340]:
+# Ячейка кода для вставки в файл задания
+
+# In[136]:
 
 
 def cell_code(text_arr=[], metadata_id="defaultCodeCell"):
@@ -452,7 +637,73 @@ def cell_code(text_arr=[], metadata_id="defaultCodeCell"):
     return add_text_begin + add_text + add_text_chara
 
 
-# In[351]:
+# ### Проверки корректности ячеек
+
+# In[195]:
+
+
+cell_markdown(generate_lab_2_indtask())
+
+
+# In[115]:
+
+
+cell_markdown(generate_lab_8_indtask())
+
+
+# In[116]:
+
+
+cell_markdown(generate_lab_10_indtask())
+
+
+# In[117]:
+
+
+cell_markdown(generate_lab_12_indtask())
+
+
+# In[118]:
+
+
+cell_markdown(["sadd\n", "meeeh"], "myIdIsClearAssHell")
+
+
+# In[119]:
+
+
+cell_markdown(["sadd\n", "meeeh"])
+
+
+# In[120]:
+
+
+cell_markdown(["sadd\n"])
+
+
+# In[121]:
+
+
+cell_markdown([])
+
+
+# In[122]:
+
+
+cell_markdown(isFirst=True)
+
+
+# In[123]:
+
+
+cell_markdown()
+
+
+# ## Генерация файла индивидуализированной лабораторной работы
+
+# Функция генерации любой из чётных лабораторных работ данного проекта
+
+# In[124]:
 
 
 def generate_even(n):
@@ -479,12 +730,14 @@ def generate_even(n):
         return None
     add = add_markdown+cell_code(metadataId="lab"+n+"indCodeCell")
     +",\"nbformat\": 4,\"nbformat_minor\": 1]}"
-    file = None
-    return file    
+    file_name= "Alg_"+str(n)+"_edit.ipynb"
+    f_name="tasks_"+str(n)+".ipynb"
+    file = open(file_name, 'r')
+    f = open(f_name, 'a')
+    f.write(file.read())
+    file.close()
+    f.write(add_text)
+    f.close()
 
-
-# In[ ]:
-
-
-
+    return f 
 
